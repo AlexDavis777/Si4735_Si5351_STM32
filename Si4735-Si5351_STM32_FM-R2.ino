@@ -31,7 +31,7 @@ Adafruit SSD1306 version=2.4.6
 #define RESET_PIN PB12        // Si473x reset pin
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-Rotary r = Rotary(PA4, PA5);
+Rotary r = Rotary(PA5, PA4);
 SI4735 si4735;
 Si5351 si5351;
 
@@ -42,7 +42,7 @@ int valF;
 byte MenueEnable = 0;
 byte menuCount = 1;
 byte dir = 0;
-byte ssbload = 1;
+byte ssbload = 0;
 bool runState = false;
 //unsigned long fstep;
 const char *currentMode;
