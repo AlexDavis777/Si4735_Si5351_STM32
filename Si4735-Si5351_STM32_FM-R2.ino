@@ -26,8 +26,8 @@ Adafruit SSD1306 version=2.4.6
 #define XTAL_F  27000000      //Xtal frequency for Si5351
 #define EEPROM_I2C_ADDR  0x50 // You might need to change this value , if pin 1,2,3 is GND (A0,A1,A2 = GND) most EEPROM address = 0x50 , 1010 A2 A1 A0 = 1010000 = 0x50
 #define button PA3            // Encoder Push and add SET switch 
-#define button1 PA6           //add Step Switch (change fst)
-#define button2 PA7           //add Mode Switch (change Mo)
+#define button1 PA6           //add Mode Switch 
+#define button2 PA7           //add Step Switch 
 #define RESET_PIN PB12        // Si473x reset pin
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
@@ -70,8 +70,8 @@ void setup() {
   pinMode(PA4, INPUT_PULLUP);
   pinMode(PA5, INPUT_PULLUP);
   pinMode(PA3, INPUT_PULLUP);
-  pinMode(PA6, INPUT_PULLUP); //add Step Switch (change fst)
-  pinMode(PA7, INPUT_PULLUP); //add Mode Switch (change Mo)
+  pinMode(PA6, INPUT_PULLUP); //add Mode Switch 
+  pinMode(PA7, INPUT_PULLUP); //add Step Switch 
   encoder0Pos = EEPROM.read(menuCount);
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
   display.setTextColor(SSD1306_WHITE);
@@ -1007,46 +1007,40 @@ void loop() {
 }
 
 /* add two button for quick change STEP or MODE *********hs0nnu**/
-void stepCheck() {
-  int fst = EEPROM.read(1);
-  if (digitalRead(button1) == LOW && fst < 8) {
-    //delay(MIN_ELAPSED_TIME);
-    fst++;
-    //elapsedCommand = millis();
-    EEPROM.write(fst - 1, encoder0Pos);
-    encoder0Pos = EEPROM.read(fst);
-    //display.setCursor(2, (fst) - 1);
-    //display.print(" ");
-  }
-  if (digitalRead(button) == LOW && fst >= 8) {
-    //delay(MIN_ELAPSED_TIME);
-    fst = 1;
-    //elapsedCommand = millis();
-    EEPROM.write(8, encoder0Pos);
-    encoder0Pos = EEPROM.read(fst);
-    //display.setCursor(2, 60);
-    //display.print(" ");
-}
-}
 void modeCheck() {
-  int Mo = EEPROM.read(2);
-  if (digitalRead(button2) == LOW && Mo < 4) {
-    //delay(MIN_ELAPSED_TIME);
-    Mo++;
-    //elapsedCommand = millis();
-    EEPROM.write(Mo - 1, encoder0Pos);
-    encoder0Pos = EEPROM.read(Mo);
-    //display.setCursor(2, (Mo) - 1);
-    //display.print(" ");
+    if (digitalRead(button1) == LOW && (currentMode == "FM")) {
+    currentMode = "AM";
+	  si4735.setTuneFrequencyAntennaCapacitor(1);
+    si4735.setAM(10650, 10750, IF, 1);
+    ssbload = 0;
   }
-  if (digitalRead(button) == LOW && Mo >= 4) {
-    //delay(MIN_ELAPSED_TIME);
-    Mo = 1;
-    //elapsedCommand = millis();
-    EEPROM.write(4, encoder0Pos);
-    encoder0Pos = EEPROM.read(Mo);
-    //display.setCursor(2, 60);
-    //display.print(" ");
+    if (digitalRead(button1) == LOW && (currentMode == "AM")) {
+    currentMode = "LSB";
+    si4735.reset();
+    si4735.setTuneFrequencyAntennaCapacitor(1);
+    si4735.loadPatch(ssb_patch_content, size_content, 1);
+    si4735.setSSB(10650, 10750, IF, 1, 2);
+    si4735.setSSBAutomaticVolumeControl(1);
+  }
+	if (digitalRead(button1) == LOW && (currentMode == "LSB")) {
+    currentMode = "USB";
+	  si4735.reset();
+    si4735.setTuneFrequencyAntennaCapacitor(1);
+    si4735.loadPatch(ssb_patch_content, size_content, 2);
+    si4735.setSSB(10650, 10750, IF, 1, 1);
+    si4735.setSSBAutomaticVolumeControl(1);
+  }
+  	else if (digitalRead(button1) == LOW && (currentMode == "USB")) {
+    currentMode = "FM";
+	si4735.setTuneFrequencyAntennaCapacitor(0);
+    si4735.setFM(6500, 6600, IF_FM / 10, 1);
+    ssbload = 0;
+  }
 }
+void stepCheck() {
+	if (digitalRead(button2) == LOW ) {
+		fstep = 1000000;
+		steps = "1MHz";
+	}
 }
 /* add two button for quick change STEP or MODE *********hs0nnu**/
