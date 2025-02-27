@@ -1058,16 +1058,25 @@ void stepCheck() {
     steps = "10kHz";
     delay (300);
   }
+    if (digitalRead(button2) == LOW && (fstep == 10)) {
+   fstep = 100;
+    steps = "100Hz";
+    delay (300);
+  }
+  if (digitalRead(button2) == LOW && (fstep == 1)) {
+   fstep = 100;
+    steps = "100Hz";
+    delay (300);
+  }
+  if (digitalRead(button2) == LOW && (fstep == 5000)) {
+   fstep = 10000;
+    steps = "10kHz";
+    delay (300);
+  }
   else if (digitalRead(button2) == LOW && (fstep == 10000)) {
    fstep = 100000;
     steps = "100kHz";
     delay (300);
   }
-/*  else (digitalRead(button2) == LOW && (fstep != 1000000 || 100000 || 10000 || 1000 || 100)); {
-   fstep = 1000;
-    steps = "1kHz";
-    //delay (300);
-  }
-  */
 }
 /* add two button for quick change STEP or MODE *********hs0nnu**/
